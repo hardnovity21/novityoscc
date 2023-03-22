@@ -1,0 +1,57 @@
+version: '3.3'
+
+services:
+
+  symfonytls-web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: symfonytls-web
+    hostname: user
+    domainname: host.lo
+    command: nginx -g "daemon off;"
+    links:
+      - symfonytls-php
+    ports:
+      - "8013:80"
+    volumes:
+      - ../:/var/www/html/
+    networks:
+      - symfonytls-network
+
+  symfonytls-php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: symfonytls-php
+    links:
+      - symfonytls-db
+    volumes:
+      - ../:/var/www/html
+    user: "1000:www-data"
+    working_dir: /var/www/html/
+    command: php-fpm
+    networks:
+      - symfonytls-network
+      - backend
+
+  symfonytls-db:
+    image: mysql:5.7
+    container_name: symfonytls-db
+    volumes:
+      - ./db/data/:/var/lib/mysql/
+      - ./db/log/:/var/log/mysql/
+    user: "1000:adm"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: dboscc
+      MYSQL_USER: toto
+      MYSQL_PASSWORD: password
+    networks:
+      - symfonytls-network
+
+networks:
+  symfonytls-network:
+    driver: bridge
+  backend:
+    driver: bridge
