@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  symfonytls-pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: symfonytls-pma
+    ports:
+      - 4013:80
+    networks:
+      - symfonytls-network
+    environment:
+      PMA_HOST: symfonytls-db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
